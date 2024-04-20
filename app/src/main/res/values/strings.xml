@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">proyectomobile</string>
+    <string name="app_name">To List</string>
     <string name="title">Lista de Tareas</string>
     <!-- Tarea 1 -->
     <string name="task1_title">Completar informe</string>
