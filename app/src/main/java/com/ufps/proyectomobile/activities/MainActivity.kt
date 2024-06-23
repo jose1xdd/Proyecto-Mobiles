@@ -1,22 +1,17 @@
-package com.ufps.proyectomobile
+package com.ufps.proyectomobile.activities
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
@@ -30,18 +25,15 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import apis.loadStaticList
+import apis.Task
+import com.ufps.proyectomobile.R
+import com.ufps.proyectomobile.components.CustomBottomAppBar
 import com.ufps.proyectomobile.ui.theme.ToListTheme
 
 class MainActivity : ComponentActivity() {
@@ -49,11 +41,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ToListTheme {
-                // A surface container using the 'background' color from the theme
+
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-                    MainScreen()
+                    MainScreen(context = this)
                 }
             }
         }
@@ -61,10 +53,10 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainScreen(modifier: Modifier = Modifier) {
+fun MainScreen(modifier: Modifier = Modifier, context: ComponentActivity) {
     Scaffold(
         topBar = { CustomTopAppBar(modifier) },
-        bottomBar = { CustomBottomAppBar(modifier) },
+        bottomBar = { CustomBottomAppBar(context = context) },
         floatingActionButton = { FloatButton(modifier) }) { innerPadding ->
         IndexList(
             modifier = modifier.padding(innerPadding)
@@ -92,18 +84,22 @@ fun CustomTopAppBar(modifier: Modifier) {
 
 @Composable
 fun FloatButton(modifier: Modifier) {
+    val context = LocalContext.current
     FloatingActionButton(
-        onClick = {}, modifier = Modifier.padding(top = 20.dp, end = 16.dp)
+        onClick = {
+            val intent = Intent(context, NewTaskActivity::class.java)
+            context.startActivity(intent)
+        },
+        modifier = Modifier.padding(top = 20.dp, end = 16.dp)
     ) {
         Icon(Icons.Filled.Add, "Floating action button.")
     }
 }
 
-
 @Composable
 fun IndexList(modifier: Modifier) {
     val context = LocalContext.current
-    var tasks by remember { mutableStateOf(loadStaticList(context)) }
+    var tasks = listOf<Task>()/*by remember { mutableStateOf(loadStaticList(context)) }*/
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
@@ -129,9 +125,6 @@ fun IndexList(modifier: Modifier) {
                         tasks[index].title, modifier = Modifier.weight(1f)
                     )
                     IconButton(onClick = {
-                        tasks = tasks.toMutableList().apply {
-                            removeAt(index)
-                        }
                     }) {
                         Icon(
                             Icons.Filled.Delete,
@@ -142,47 +135,5 @@ fun IndexList(modifier: Modifier) {
             }
         }
     }
-
 }
 
-
-@Composable
-fun CustomBottomAppBar(modifier: Modifier = Modifier) {
-    BottomAppBar(
-        modifier = modifier,
-        content = {
-            Row(
-                horizontalArrangement = Arrangement.SpaceAround,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                IconButton(onClick = { /* do something */ }) {
-                    Icon(
-                        Icons.Filled.Menu, contentDescription = "Localized description"
-                    )
-                }
-                IconButton(onClick = { /* do something */ }) {
-                    Icon(
-                        Icons.Filled.Home,
-                        contentDescription = "Localized description",
-                    )
-                }
-                IconButton(onClick = { /* do something */ }) {
-                    Icon(
-                        Icons.Filled.AccountBox,
-                        contentDescription = "Localized description",
-                    )
-                }
-            }
-        },
-    )
-}
-
-@Preview()
-@Composable
-fun MainScreenPreview() {
-    ToListTheme(darkTheme = true) {
-        MainScreen()
-    }
-}
