@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">To List</string>
     <string name="title_activity_login">LoginActivity</string>
-    <string name="title">Lista de Tareas</string>
-    <string name="login_tittle">Bienvenido, por favor inicia sesión</string>
+    <string name="title">Task List</string>
+    <string name="login_tittle">Welcome, please login</string>
     <string name="input_login_user">Username</string>
     <string name="input_login_password">Password</string>
     <string name="buttom_login">Login</string>
@@ -11,5 +11,4 @@
     <string name="error_title">Error</string>
     <string name="invalid_credentials">Invalid credentials. Please try again.</string>
     <string name="ok">OK</string>
-    <string name="title_activity_update_task">UpdateTaskActivity</string>
 </resources>
