@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -13,7 +15,12 @@
         android:theme="@style/Theme.Proyectomobile"
         tools:targetApi="31">
         <activity
-            android:name=".ProfileActivity"
+            android:name=".activities.UpdateTaskActivity"
+            android:exported="false"
+            android:label="@string/title_activity_update_task"
+            android:theme="@style/Theme.Proyectomobile" />
+        <activity
+            android:name=".activities.ProfileActivity"
             android:exported="false"
             android:label="@string/title_activity_profile"
             android:theme="@style/Theme.Proyectomobile" />

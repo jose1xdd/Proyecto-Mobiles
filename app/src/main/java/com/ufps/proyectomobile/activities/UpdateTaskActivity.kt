@@ -1,9 +1,9 @@
 package com.ufps.proyectomobile.activities
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,12 +15,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -37,14 +37,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ufps.proyectomobile.apis.MainViewModel
-import com.ufps.proyectomobile.apis.dtos.Task
 import com.ufps.proyectomobile.apis.repository.RepositoryImpl
 import com.ufps.proyectomobile.components.CustomBottomAppBar
 import com.ufps.proyectomobile.storage.SharedPreferencesManager
 import com.ufps.proyectomobile.ui.theme.ToListTheme
-import kotlinx.coroutines.launch
 
-class NewTaskActivity : ComponentActivity() {
+class UpdateTaskActivity : ComponentActivity() {
     private lateinit var sharedPreferencesManager: SharedPreferencesManager
     private lateinit var mainViewModel: MainViewModel
 
@@ -58,7 +56,7 @@ class NewTaskActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-                    NewTaskScreen(onBackClick = { finish() }, this, mainViewModel, sharedPreferencesManager)
+                    UpdateTaskActivity(onBackClick = { finish() }, this, sharedPreferencesManager)
                 }
             }
         }
@@ -67,15 +65,14 @@ class NewTaskActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewTaskScreen(
+fun UpdateTaskActivity(
     onBackClick: () -> Unit,
     context: ComponentActivity,
-    mainViewModel: MainViewModel,
     sharedPreferencesManager: SharedPreferencesManager
 ) {
-    val titleState = remember { mutableStateOf("") }
-    val descriptionState = remember { mutableStateOf("") }
-    val priorityState = remember { mutableStateOf("") }
+    val titleState = remember { mutableStateOf(sharedPreferencesManager.getTaskTitle().toString()) }
+    val descriptionState = remember { mutableStateOf(sharedPreferencesManager.getTaskDesc().toString()) }
+    val priorityState = remember { mutableStateOf(sharedPreferencesManager.getTaskPrio().toString()) }
     val coroutineScope = rememberCoroutineScope()
     val showDialog = remember { mutableStateOf(false) }
 
@@ -83,7 +80,7 @@ fun NewTaskScreen(
         AlertDialog(
             onDismissRequest = { showDialog.value = false },
             title = { Text(text = "Success", color = Color.Green) },
-            text = { Text(text = "Task created successfully!") },
+            text = { Text(text = "Task Update successfully!") },
             confirmButton = {
                 TextButton(onClick = {
                     showDialog.value = false
@@ -98,7 +95,7 @@ fun NewTaskScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "New Task") },
+                title = { Text(text = "View Task") },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back")
@@ -114,6 +111,7 @@ fun NewTaskScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(20.dp)
+                .background(MaterialTheme.colorScheme.surface)
         ) {
             Box(
                 modifier = Modifier
@@ -122,7 +120,7 @@ fun NewTaskScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "New Task", fontSize = 26.sp, fontWeight = FontWeight.Bold
+                    text = "View Task", fontSize = 26.sp, fontWeight = FontWeight.Bold
                 )
             }
 
@@ -136,70 +134,40 @@ fun NewTaskScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    OutlinedTextField(
-                        value = titleState.value,
-                        onValueChange = { titleState.value = it },
-                        label = {
-                            Text(
-                                text = "Task Title",
-                                fontSize = 20.sp,
-                                modifier = Modifier.padding(bottom = 4.dp)
-                            )
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.height(20.dp))
-                    OutlinedTextField(
-                        value = descriptionState.value,
-                        onValueChange = { descriptionState.value = it },
-                        label = {
-                            Text(
-                                text = "Task Description",
-                                fontSize = 20.sp,
-                                modifier = Modifier.padding(bottom = 4.dp)
-                            )
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.height(20.dp))
-                    OutlinedTextField(
-                        value = priorityState.value,
-                        onValueChange = { priorityState.value = it },
-                        label = {
-                            Text(
-                                text = "Priority",
-                                fontSize = 20.sp,
-                                modifier = Modifier.padding(bottom = 4.dp)
-                            )
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.height(20.dp))
-                    Button(
-                        onClick = {
-                            val token = sharedPreferencesManager.getToken()
-                            if (token != null) {
-                                coroutineScope.launch {
-                                    try {
-                                        val task = Task(
-                                            name = titleState.value,
-                                            description = descriptionState.value,
-                                            priority = priorityState.value.toInt(),
-                                            completed = false
-                                        )
-                                        val createdTask = mainViewModel.createTask(token, task)
-                                        showDialog.value = true
-                                    } catch (e: Exception) {
-                                        Toast.makeText(context, "Error creating task: ${e.message}", Toast.LENGTH_SHORT).show()
-                                    }
-                                }
-                            } else {
-                                Toast.makeText(context, "No token found", Toast.LENGTH_SHORT).show()
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth()
+                    Card(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                     ) {
-                        Text(text = "Create", fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                        Text(
+                            text = "Task Title: ${titleState.value}",
+                            fontSize = 20.sp,
+                            modifier = Modifier.padding(16.dp),
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Card(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                    ) {
+                        Text(
+                            text = "Task Description: ${descriptionState.value}",
+                            fontSize = 20.sp,
+                            modifier = Modifier.padding(16.dp),
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Card(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                    ) {
+                        Text(
+                            text = "Priority: ${priorityState.value}",
+                            fontSize = 20.sp,
+                            modifier = Modifier.padding(16.dp),
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
                     }
                 }
             }

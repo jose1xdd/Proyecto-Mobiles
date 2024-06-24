@@ -1,7 +1,8 @@
-package com.ufps.proyectomobile
+package com.ufps.proyectomobile.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -29,26 +30,38 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ufps.proyectomobile.activities.LoginActivity
+import com.ufps.proyectomobile.R
 import com.ufps.proyectomobile.components.CustomBottomAppBar
+import com.ufps.proyectomobile.storage.SharedPreferencesManager
 import com.ufps.proyectomobile.ui.theme.ToListTheme
 
 class ProfileActivity : ComponentActivity() {
+    private lateinit var sharedPreferencesManager: SharedPreferencesManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        sharedPreferencesManager = SharedPreferencesManager(this)
+
         setContent {
             ToListTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    // Obtener el user guardado desde SharedPreferences
+                    val user = sharedPreferencesManager.getUser() ?: "No user found"
+                    val token = sharedPreferencesManager.getToken()
+                    Log.d("TOKEN",token.toString())
                     ProfileScreen(
                         onBackClick = { finish() },
                         onLogoutClick = {
-                            val intent = Intent(this, LoginActivity::class.java)
+                            sharedPreferencesManager.clear()
+                            val intent = Intent(this@ProfileActivity, LoginActivity::class.java)
                             startActivity(intent)
                             finish()
                         },
+                        user = user,
                         this
                     )
                 }
@@ -57,9 +70,10 @@ class ProfileActivity : ComponentActivity() {
     }
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(onBackClick: () -> Unit, onLogoutClick: () -> Unit, context: ComponentActivity) {
+fun ProfileScreen(onBackClick: () -> Unit, onLogoutClick: () -> Unit, user: String,context: ComponentActivity) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -83,7 +97,7 @@ fun ProfileScreen(onBackClick: () -> Unit, onLogoutClick: () -> Unit, context: C
         ) {
             // Profile Picture
             Image(
-                painter = painterResource(id = R.drawable.baseline_account_circle_24), // Make sure to add a profile picture resource
+                painter = painterResource(id = R.drawable.baseline_account_circle_24),
                 contentDescription = null,
                 modifier = Modifier
                     .size(100.dp)
@@ -95,7 +109,7 @@ fun ProfileScreen(onBackClick: () -> Unit, onLogoutClick: () -> Unit, context: C
 
             // Email Text
             Text(
-                text = "Email: test@gmail.com",
+                text = "Email: $user",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 16.dp)
@@ -108,4 +122,3 @@ fun ProfileScreen(onBackClick: () -> Unit, onLogoutClick: () -> Unit, context: C
         }
     }
 }
-

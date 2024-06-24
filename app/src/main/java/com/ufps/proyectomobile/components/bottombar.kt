@@ -15,8 +15,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.ufps.proyectomobile.ProfileActivity
 import com.ufps.proyectomobile.activities.MainActivity
+import com.ufps.proyectomobile.activities.ProfileActivity
 
 @Composable
 fun CustomBottomAppBar(context: Context, modifier: Modifier = Modifier) {

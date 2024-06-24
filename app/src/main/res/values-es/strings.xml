@@ -3,8 +3,12 @@
     <string name="title">Lista de Tareas</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="login_tittle">Bienvenido, por favor inicia sesión</string>
-    <string name="input_login_email">Email</string>
+    <string name="input_login_user">Usuario</string>
     <string name="input_login_password">Contraseña</string>.
     <string name="buttom_login">Iniciar sesión</string>
     <string name="title_activity_new_task">NewTask</string>
+    <string name="title_activity_profile">ProfileActivity</string>
+    <string name="error_title">Error</string>
+    <string name="invalid_credentials">Credenciales inválidas. Inténtalo de nuevo.</string>
+    <string name="ok">Aceptar</string>
 </resources>
